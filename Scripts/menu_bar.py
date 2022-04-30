@@ -5,7 +5,7 @@ import json
 import os
 import sys
 
-from Scripts.views import View_Default, View_Navigation
+from Scripts.views import ViewDefault, ViewNavigation
 from Scripts.vocable import Vocable
 
 class Menu_Bar(Menu):
@@ -48,7 +48,7 @@ class Menu_Bar(Menu):
 
                     self.parent.title(f"{fn} - Polish Trainer")
                     self.parent.lbl_status_file["text"] = fn
-                    self.parent.view_controller.set_view(View_Navigation)
+                    self.parent.view_controller.set_view(ViewNavigation)
 
                     self.menu_file.entryconfigure("Close...", state=NORMAL)
             except:
@@ -70,7 +70,7 @@ class Menu_Bar(Menu):
             self.parent.lbl_status_view["text"] = ""
             self.parent.lbl_status_wordcount["text"] = ""
 
-            self.parent.view_controller.set_view(View_Default)
+            self.parent.view_controller.set_view(ViewDefault)
 
     @staticmethod
     def exit():

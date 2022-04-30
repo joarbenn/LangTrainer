@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 
-from Scripts.views import View_Controller, View_Default
+from Scripts.views import ViewController, ViewDefault
 from Scripts.menu_bar import Menu_Bar
 
 class App(Tk):
@@ -18,8 +18,8 @@ class App(Tk):
         self.bind("<Control-o>", lambda _: self.menubar.deck_open())
 
         # Create View Controller and set the Active View to default
-        self.view_controller = View_Controller(self)
-        self.active_view = View_Default(self, self.view_controller)
+        self.view_controller = ViewController(self)
+        self.active_view = ViewDefault(self, self.view_controller)
 
         # Default Styles
         self.style = ttk.Style(self)

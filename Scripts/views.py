@@ -8,21 +8,24 @@ import jsonpickle
 
 from Scripts.vocable import Vocable
 
-class View_Controller:
+
+class ViewController:
     def __init__(self, app):
         self.app = app
 
-    def set_view(self, View):
+    def set_view(self, view):
         self.app.active_view.destroy()
-        self.app.active_view = View(self.app, self)
+        self.app.active_view = view(self.app, self)
         self.app.active_view.pack(pady=5)
 
-class View_Default(ttk.Frame):
+
+class ViewDefault(ttk.Frame):
     def __init__(self, container, controller):
         super().__init__(container)
         self.controller = controller
 
-class View_Navigation(ttk.Frame):
+
+class ViewNavigation(ttk.Frame):
     def __init__(self, container, controller):
         super().__init__(container)
         self.controller = controller
@@ -34,12 +37,13 @@ class View_Navigation(ttk.Frame):
         self.btn_edit.grid(row=1, column=0, columnspan=2, padx=2, pady=2, ipady=1)
 
     def btn_play_click(self):
-        self.controller.set_view(View_Play)
+        self.controller.set_view(ViewPlay)
 
     def btn_edit_click(self):
-        self.controller.set_view(View_Edit)
+        self.controller.set_view(ViewEdit)
 
-class View_Play(ttk.Frame):
+
+class ViewPlay(ttk.Frame):
     def __init__(self, container, controller):
         super().__init__(container)
         self.controller = controller
@@ -111,9 +115,10 @@ class View_Play(ttk.Frame):
     def btn_back_click(self):
         self.controller.app.lbl_status_wordcount["text"] = ""
         self.controller.app.lbl_status_view["text"] = ""
-        self.controller.set_view(View_Navigation)
+        self.controller.set_view(ViewNavigation)
 
-class View_Edit(ttk.Frame):
+
+class ViewEdit(ttk.Frame):
     def __init__(self, container, controller):
         super().__init__(container)
 
@@ -176,7 +181,7 @@ class View_Edit(ttk.Frame):
                 style="Delete.TButton",
                 command=functools.partial(self.btn_delete_word, langid=0, row=idx)
             )
-            self.btn_removeword.grid(row=2 + idx, column = 2)
+            self.btn_removeword.grid(row=2 + idx, column=2)
         for idx, word in enumerate(self.deck_temp[self.vocableid].words[1]):
             self.entry_var = StringVar()
             self.entry_vars[1].append(self.entry_var)
@@ -289,8 +294,8 @@ class View_Edit(ttk.Frame):
         self.update_deck_list()
         self.save = messagebox.askyesnocancel(title="Save changes", message="Do you want to save your changes?")
 
-        if self.save != None:
-            if self.save == True:
+        if self.save is not None:
+            if self.save:
                 self.controller.app.deck_current = deepcopy(self.deck_temp)
                 jsonpickle.set_encoder_options('json', sort_keys=True, indent=4)
                 vocable_json = jsonpickle.encode(self.deck_temp, unpicklable=False)
@@ -303,4 +308,4 @@ class View_Edit(ttk.Frame):
             self.controller.app.unbind("<Right>")
             self.controller.app.lbl_status_wordcount["text"] = ""
             self.controller.app.lbl_status_view["text"] = ""
-            self.controller.set_view(View_Navigation)
+            self.controller.set_view(ViewNavigation)
