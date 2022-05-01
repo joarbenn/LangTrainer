@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter import ttk
 
 from Scripts.views import ViewController, ViewDefault
-from Scripts.menu_bar import Menu_Bar
+from Scripts.menubar import MenuBar
 
 class App(Tk):
     def __init__(self, title, geometry):
@@ -13,7 +13,7 @@ class App(Tk):
         self.config(bg="#FFFFFF")
 
         # Menubar
-        self.menubar = Menu_Bar(self)
+        self.menubar = MenuBar(self)
         self.config(menu=self.menubar)
         self.bind("<Control-o>", lambda _: self.menubar.deck_open())
 
