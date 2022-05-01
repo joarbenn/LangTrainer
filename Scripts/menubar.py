@@ -13,6 +13,7 @@ class MenuBar(Menu):
     def __init__(self, parent):
         super().__init__()
 
+        self.close = None
         self.parent = parent
 
         self.menu_file = Menu(self, tearoff=False)
@@ -52,7 +53,7 @@ class MenuBar(Menu):
                     self.parent.view_controller.set_view(ViewNavigation)
 
                     self.menu_file.entryconfigure("Close...", state=NORMAL)
-            except:
+            except FileNotFoundError:
                 error_msg = f"{self.fp}\nPolish Trainer cannot read this file.\n"\
                             "This is not a valid json file, or the format is incorrect"
                 messagebox.showerror(title="Polish Trainer", message=error_msg)

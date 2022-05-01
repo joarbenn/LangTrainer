@@ -309,6 +309,7 @@ class ViewEdit(ttk.Frame):
                     f.truncate(0)
                     f.write(vocable_json)
 
+            self.controller.app.unbind("<Escape>")
             self.controller.app.unbind("<Left>")
             self.controller.app.unbind("<Right>")
             self.controller.app.lbl_status_wordcount["text"] = ""
