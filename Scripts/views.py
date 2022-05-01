@@ -40,6 +40,7 @@ class ViewNavigation(ttk.Frame):
         self.controller.set_view(ViewPlay)
 
     def btn_edit_click(self):
+        print("test")
         self.controller.set_view(ViewEdit)
 
 
@@ -105,7 +106,9 @@ class ViewPlay(ttk.Frame):
         else:
             self.entry_word["foreground"] = "Black"
             self.bind("<Return>", lambda x: self.checkword())
-            self.controller.app.lbl_status_wordcount["text"] = f"- word {len(self.controller.app.deck_current) - len(self.deck_temp) + 1} of {len(self.controller.app.deck_current)}"
+            self.controller.app.lbl_status_wordcount["text"] = \
+                f"- word {len(self.controller.app.deck_current) - len(self.deck_temp) + 1}" \
+                f" of {len(self.controller.app.deck_current)}"
 
             self.entry_word.focus()
             self.lbl_word["text"] = self.deck_temp[0].words[0][0].capitalize()
@@ -124,10 +127,12 @@ class ViewEdit(ttk.Frame):
 
         self.controller = controller
         self.deck_temp = deepcopy(self.controller.app.deck_current)
+        self.vocable_id = 0
+
         self.update_view()
 
-    def update_view(self, vocableid=0):
-        self.vocableid = vocableid
+    def update_view(self, vocable_id=0):
+        self.vocable_id = vocable_id
 
         for widget in self.winfo_children():
             widget.destroy()
@@ -136,13 +141,13 @@ class ViewEdit(ttk.Frame):
         self.btn_cancel.pack()
         # self.btn_cancel.grid(row=0, column=0, columnspan=2, padx=2, ipady=1)
 
-        if self.vocableid > len(self.deck_temp) - 1:
-            self.vocableid = 0
-        if self.vocableid < 0:
-            self.vocableid = len(self.deck_temp) - 1
+        if self.vocable_id > len(self.deck_temp) - 1:
+            self.vocable_id = 0
+        if self.vocable_id < 0:
+            self.vocable_id = len(self.deck_temp) - 1
 
         self.controller.app.lbl_status_view["text"] = "- Editing"
-        self.controller.app.lbl_status_wordcount["text"] = f"- word {self.vocableid + 1} of {len(self.deck_temp)}"
+        self.controller.app.lbl_status_wordcount["text"] = f"- word {self.vocable_id + 1} of {len(self.deck_temp)}"
 
         self.frm_vocable_words = ttk.Frame(self)
         self.frm_vocable_nav = ttk.Frame(self)
@@ -167,7 +172,7 @@ class ViewEdit(ttk.Frame):
         self.btn_addvocable.grid(row=0, column=1, columnspan=4, pady=2)
         self.btn_removevocable.grid(row=1, column=1, columnspan=4, pady=(0, 10))
 
-        for idx, word in enumerate(self.deck_temp[self.vocableid].words[0]):
+        for idx, word in enumerate(self.deck_temp[self.vocable_id].words[0]):
             self.entry_var = StringVar()
             self.entry_vars[0].append(self.entry_var)
             self.entry = ttk.Entry(self.frm_vocable_words, font=("Arial", 8), textvariable=self.entry_var)
@@ -182,7 +187,7 @@ class ViewEdit(ttk.Frame):
                 command=functools.partial(self.btn_delete_word, langid=0, row=idx)
             )
             self.btn_removeword.grid(row=2 + idx, column=2)
-        for idx, word in enumerate(self.deck_temp[self.vocableid].words[1]):
+        for idx, word in enumerate(self.deck_temp[self.vocable_id].words[1]):
             self.entry_var = StringVar()
             self.entry_vars[1].append(self.entry_var)
             self.entry = ttk.Entry(self.frm_vocable_words, font=("Arial", 8), textvariable=self.entry_var)
@@ -205,7 +210,7 @@ class ViewEdit(ttk.Frame):
             style="Add.TButton",
             command=lambda: self.btn_add_word(0)
         )
-        self.btn_addword.grid(row=2 + len(self.deck_temp[self.vocableid].words[0]), column=1)
+        self.btn_addword.grid(row=2 + len(self.deck_temp[self.vocable_id].words[0]), column=1)
 
         self.btn_addword = ttk.Button(
             self.frm_vocable_words,
@@ -214,7 +219,7 @@ class ViewEdit(ttk.Frame):
             style="Add.TButton",
             command=lambda: self.btn_add_word(1)
         )
-        self.btn_addword.grid(row=2 + len(self.deck_temp[self.vocableid].words[1]), column=3)
+        self.btn_addword.grid(row=2 + len(self.deck_temp[self.vocable_id].words[1]), column=3)
 
         self.frm_vocable_words.pack(pady=20)
         self.frm_vocable_nav.pack(side="bottom", pady=20)
@@ -222,17 +227,17 @@ class ViewEdit(ttk.Frame):
         self.btn_prev = ttk.Button(
             self.frm_vocable_nav,
             text="Prev", width=8,
-            command=lambda: self.switch_vocable(self.vocableid - 1)
+            command=lambda: self.switch_vocable(self.vocable_id - 1)
         )
-        self.controller.app.bind("<Left>", lambda x: self.switch_vocable(self.vocableid - 1))
+        self.controller.app.bind("<Left>", lambda x: self.switch_vocable(self.vocable_id - 1))
         self.btn_prev.grid(row=0, column=0)
 
         self.btn_next = ttk.Button(
             self.frm_vocable_nav,
             text="Next", width=8,
-            command=lambda: self.switch_vocable(self.vocableid + 1)
+            command=lambda: self.switch_vocable(self.vocable_id + 1)
         )
-        self.controller.app.bind("<Right>", lambda x: self.switch_vocable(self.vocableid + 1))
+        self.controller.app.bind("<Right>", lambda x: self.switch_vocable(self.vocable_id + 1))
         self.btn_next.grid(row=0, column=1)
 
         self.controller.app.bind("<Escape>", lambda x: self.btn_back_click())
@@ -242,35 +247,35 @@ class ViewEdit(ttk.Frame):
         self.update_view(vocable)
 
     def update_deck_list(self):
-        self.deck_temp[self.vocableid].words[0] = []
-        self.deck_temp[self.vocableid].words[1] = []
+        self.deck_temp[self.vocable_id].words[0] = []
+        self.deck_temp[self.vocable_id].words[1] = []
 
         for ev in self.entry_vars[0]:
-            self.deck_temp[self.vocableid].words[0].append(ev.get())
+            self.deck_temp[self.vocable_id].words[0].append(ev.get())
         for ev in self.entry_vars[1]:
-            self.deck_temp[self.vocableid].words[1].append(ev.get())
+            self.deck_temp[self.vocable_id].words[1].append(ev.get())
 
     def btn_add_word(self, langid):
         self.update_deck_list()
         if langid == 0:
-            self.deck_temp[self.vocableid].words[0].append("")
-            self.update_view(self.vocableid)
+            self.deck_temp[self.vocable_id].words[0].append("")
+            self.update_view(self.vocable_id)
         if langid == 1:
-            self.deck_temp[self.vocableid].words[1].append("")
-            self.update_view(self.vocableid)
+            self.deck_temp[self.vocable_id].words[1].append("")
+            self.update_view(self.vocable_id)
 
     def btn_delete_word(self, langid, row):
         self.update_deck_list()
         if langid == 0:
-            if len(self.deck_temp[self.vocableid].words[0]) > 1:
-                self.deck_temp[self.vocableid].words[0].pop(row)
-                self.update_view(self.vocableid)
+            if len(self.deck_temp[self.vocable_id].words[0]) > 1:
+                self.deck_temp[self.vocable_id].words[0].pop(row)
+                self.update_view(self.vocable_id)
             else:
                 messagebox.showerror(title="Error", message="Cannot remove last word from a vocable.")
         if langid == 1:
-            if len(self.deck_temp[self.vocableid].words[1]) > 1:
-                self.deck_temp[self.vocableid].words[1].pop(row)
-                self.update_view(self.vocableid)
+            if len(self.deck_temp[self.vocable_id].words[1]) > 1:
+                self.deck_temp[self.vocable_id].words[1].pop(row)
+                self.update_view(self.vocable_id)
             else:
                 messagebox.showerror(title="Error", message="Cannot remove last word from a vocable.")
 
@@ -283,11 +288,11 @@ class ViewEdit(ttk.Frame):
     def btn_delete_vocable(self):
         if len(self.deck_temp) > 1:
             self.update_deck_list()
-            self.deck_temp.pop(self.vocableid)
-            self.update_view(self.vocableid)
+            self.deck_temp.pop(self.vocable_id)
+            self.update_view(self.vocable_id)
         else:
             self.update_deck_list()
-            self.deck_temp.pop(self.vocableid)
+            self.deck_temp.pop(self.vocable_id)
             self.btn_back_click()
 
     def btn_back_click(self):
